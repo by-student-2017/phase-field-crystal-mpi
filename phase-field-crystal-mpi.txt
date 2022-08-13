@@ -32,7 +32,13 @@
 
 - Examples (python code)
 1. cd $HOME/phase-field-crystal-mpi/examples
-2. cd python_code_no1
+2. cd python_code_seed
+3. python3 main.py
+(you can get "fig/*.png")
+
+- Examples (python code)
+1. cd $HOME/phase-field-crystal-mpi/examples
+2. cd python_code_circle
 3. python3 main.py
 (you can get "fig/*.png")
 -----------------------------------------------------------------------------
