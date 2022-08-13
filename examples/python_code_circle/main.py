@@ -32,9 +32,11 @@ vv = 1.0        # nu  * (phi^4)/4,, Eq.(2.2)
 
 out_time = 80   # output every "out_time/dt"
 
-max_iterations = 10000
+max_iterations = 10000 # run for max_iterations time steps
 
-amplitude = 0.10867304595992146
+#angle = 0.0872665
+angle = 3.1415926/180*5.0 # the grain rotation angle [rad] (e.g., 5 [degree])
+amplitude = 0.10867304595992146 # the perfect lattice equilibrium value
 
 # parameters ---------------------------------------------------
 # one mode approximation lowest order reciprocal lattice vectors
@@ -67,7 +69,7 @@ def init_state_circle(eta):
     """
 
     # Keep amplitude constant, but rotate the phase by some angle for a circle in the middle
-    angle = 0.0872665
+    # angle = 0.0872665
     #amplitude = 0.10867304595992146
 
     theta = np.zeros((3, nx, ny))
@@ -567,7 +569,8 @@ def main():
     eta = np.zeros((3, nx, ny), dtype=np.complex128)
     
     # Initialize state to rotated grain and calculate Fourier transform
-    init_state_seed(eta)
+    #init_state_seed(eta)
+    init_state_circle(eta)
 
     #fig = plt.figure(figsize=(10, 10))
     #plt.pcolormesh(abs(eta[0]) + abs(eta[1]) + abs(eta[2]))
