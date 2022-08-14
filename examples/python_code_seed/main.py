@@ -101,7 +101,10 @@ def init_state_seed(eta):
 
     seed_pos = np.random.rand(nparticles,2)
     seed_angles = np.random.rand(nparticles)
+    seed_angles = seed_angles * 3.1415926
     seed_angles[0] = 0.0
+    print("position of seeds [0:1] \n", seed_pos)
+    print("angle of seeds [rad] \n",seed_angles)
     #seed_pos = [(0.3, 0.5), (0.7, 0.5)]
     #seed_angles = [0.0, 0.2]
 
