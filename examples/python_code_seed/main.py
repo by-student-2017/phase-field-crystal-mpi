@@ -35,7 +35,9 @@ out_time = 80   # output every "out_time/dt"
 max_iterations = 10000 # run for max_iterations time steps
 
 #angle = 0.0872665
-angle = 3.1415926/180*5.0 # the grain rotation angle [rad] (e.g., 5 [degree])
+#angle = 3.1415926/180*5.0 # the grain rotation angle [rad] (e.g., 5 [degree])
+nparticles = 5 # number of particles
+particle_radius = 0.05
 amplitude = 0.10867304595992146 # the perfect lattice equilibrium value
 
 # parameters ---------------------------------------------------
@@ -69,7 +71,7 @@ def init_state_circle(eta):
     """
 
     # Keep amplitude constant, but rotate the phase by some angle for a circle in the middle
-    angle = 0.0872665
+    # angle = 0.0872665
     #amplitude = 0.10867304595992146
 
     theta = np.zeros((3, nx, ny))
@@ -94,10 +96,14 @@ def init_state_circle(eta):
 def init_state_seed(eta):
 
     #amplitude = 0.10867304595992146
-    seed_radius = 0.15*nx*dx
+    #seed_radius = 0.15*nx*dx
+    seed_radius = particle_radius*nx*dx
 
-    seed_pos = [(0.3, 0.5), (0.7, 0.5)]
-    seed_angles = [0.0, 0.2]
+    seed_pos = np.random.rand(nparticles,2)
+    seed_angles = np.random.rand(nparticles)
+    seed_angles[0] = 0.0
+    #seed_pos = [(0.3, 0.5), (0.7, 0.5)]
+    #seed_angles = [0.0, 0.2]
 
     for i in range(nx):
         for j in range(ny):
@@ -309,8 +315,8 @@ def calc_grad_theta(eta, eta_k):
     dtheta = np.zeros((3, nx, ny))
     for i in range(3):
         dtheta[i] = (np.dot(q_vectors[i], q_vectors[0])*im[0]
-                      + np.dot(q_vectors[i], q_vectors[1])*im[1]
-                      + np.dot(q_vectors[i], q_vectors[2])*im[2])
+                   + np.dot(q_vectors[i], q_vectors[1])*im[1]
+                   + np.dot(q_vectors[i], q_vectors[2])*im[2])
     return dtheta
 
 
@@ -370,8 +376,8 @@ def calc_grad_theta_fd(eta, eta_k):
     dtheta = np.zeros((3, nx, ny))
     for i in range(3):
         dtheta[i] = (np.dot(q_vectors[i], q_vectors[0])*im[0]
-                      + np.dot(q_vectors[i], q_vectors[1])*im[1]
-                      + np.dot(q_vectors[i], q_vectors[2])*im[2])
+                   + np.dot(q_vectors[i], q_vectors[1])*im[1]
+                   + np.dot(q_vectors[i], q_vectors[2])*im[2])
     return dtheta
 
 
@@ -570,6 +576,7 @@ def main():
     
     # Initialize state to rotated grain and calculate Fourier transform
     init_state_seed(eta)
+    #init_state_circle(eta)
 
     #fig = plt.figure(figsize=(10, 10))
     #plt.pcolormesh(abs(eta[0]) + abs(eta[1]) + abs(eta[2]))
@@ -580,6 +587,8 @@ def main():
     eta_k = np.fft.fft2(eta)
     
     # Calculate derivative operators in k-space
+    #calculate_coefficients()
+    #calculate_coefficients_mat()
     calculate_coefficients_tile()
     
     #Take 80 PFC time siteps
@@ -587,6 +596,7 @@ def main():
         time_step(eta, eta_k)
         if ts % int(out_time/dt) == 0:
                 fig = plt.figure(figsize=(10, 10))
+                #plt.pcolormesh(abs(eta[0])+abs(eta[1])+abs(eta[2]))
                 plt.pcolormesh(abs(eta[0])+abs(eta[1])+abs(eta[2]))
                 plt.xlim([0, nx])
                 plt.ylim([0, ny])
