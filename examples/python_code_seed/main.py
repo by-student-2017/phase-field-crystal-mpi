@@ -599,7 +599,6 @@ def main():
         time_step(eta, eta_k)
         if ts % int(out_time/dt) == 0:
                 fig = plt.figure(figsize=(10, 10))
-                #plt.pcolormesh(abs(eta[0])+abs(eta[1])+abs(eta[2]))
                 plt.pcolormesh(abs(eta[0])+abs(eta[1])+abs(eta[2]))
                 plt.xlim([0, nx])
                 plt.ylim([0, ny])
@@ -613,6 +612,12 @@ def main():
     eta_k[:] = np.fft.fft2(eta)
 
     ##Save eta to file
+    fig = plt.figure(figsize=(10, 10))
+    plt.pcolormesh(abs(eta[0])+abs(eta[1])+abs(eta[2]))
+    plt.xlim([0, nx])
+    plt.ylim([0, ny])
+    plt.savefig("./fig/seed_last.png", dpi=200)
+    plt.close(fig)
     #np.save("./data/test_run/test", eta)
     np.save("./fig/eta.txt", eta)
 
