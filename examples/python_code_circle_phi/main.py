@@ -35,8 +35,7 @@ out_time = 80   # output every "out_time/dt"
 max_iterations = 10000 # run for max_iterations time steps
 
 angle = 3.1415926/180*5.0 # the grain rotation angle [rad] (e.g., 5 [degree])
-#nparticles = 5 # number of particles
-#particle_radius = 0.05
+
 amplitude = 0.10867304595992146 # the perfect lattice equilibrium value
 
 # parameters ---------------------------------------------------
@@ -610,6 +609,7 @@ def main():
                 plt.xlim([0, nx])
                 plt.ylim([0, ny])
                 plt.title("time %.1f" % (ts*dt))
+                plt.rcParams["image.cmap"] = "jet"
                 plt.savefig("./fig/eta_seed_dt%0.3f_%.0f.png" % (dt, ts*dt), dpi=200)
                 plt.close(fig)
                 #
@@ -619,10 +619,11 @@ def main():
                 #              + abs(eta[2]+eta[2].conjugate()) )
                 plt.pcolormesh( abs(eta[0]*exp_part[0]+(eta[0]*exp_part[0]).conjugate()
                                   + eta[1]*exp_part[1]+(eta[1]*exp_part[1]).conjugate()
-                                  + eta[2]*exp_part[2]+(eta[2]*exp_part[2]).conjugate()) )
+                                  + eta[2]*exp_part[2]+(eta[2]*exp_part[2]).conjugate())  )
                 plt.xlim([0, nx])
                 plt.ylim([0, ny])
                 plt.title("time %.1f" % (ts*dt))
+                plt.rcParams["image.cmap"] = "jet"
                 plt.savefig("./fig/phi_seed_dt%0.3f_%.0f.png" % (dt, ts*dt), dpi=200)
                 plt.close(fig)
 
@@ -638,6 +639,7 @@ def main():
     plt.xlim([0, nx])
     plt.ylim([0, ny])
     plt.title("time last")
+    plt.rcParams["image.cmap"] = "jet"
     plt.savefig("./fig/eta_seed_last.png", dpi=200)
     plt.close(fig)
     #
@@ -648,6 +650,7 @@ def main():
     plt.xlim([0, nx])
     plt.ylim([0, ny])
     plt.title("time last")
+    plt.rcParams["image.cmap"] = "jet"
     plt.savefig("./fig/phi_seed_last.png", dpi=200)
     plt.close(fig)
     #np.save("./data/test_run/test", eta)
