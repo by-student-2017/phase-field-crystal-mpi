@@ -601,8 +601,15 @@ def main():
     eta_k[:] = np.fft.fft2(eta)
 
     ##Save eta to file
+    fig = plt.figure(figsize=(10, 10))
+    plt.pcolormesh(abs(eta[0])+abs(eta[1])+abs(eta[2]))
+    plt.xlim([0, nx])
+    plt.ylim([0, ny])
+    plt.title("time last")
+    plt.savefig("./fig/seed_dt%0.3f_%.0f.png" % (dt, ts*dt), dpi=200)
+    plt.close(fig)
     #np.save("./data/test_run/test", eta)
-    np.save("./fig/eta.txt", eta)
+    np.save("./fig/eta_last", eta)
 
 
 if __name__ == "__main__":

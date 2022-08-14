@@ -616,10 +616,11 @@ def main():
     plt.pcolormesh(abs(eta[0])+abs(eta[1])+abs(eta[2]))
     plt.xlim([0, nx])
     plt.ylim([0, ny])
+    plt.title("time last")
     plt.savefig("./fig/seed_last.png", dpi=200)
     plt.close(fig)
     #np.save("./data/test_run/test", eta)
-    np.save("./fig/eta.txt", eta)
+    np.save("./fig/eta_last", eta)
 
 
 if __name__ == "__main__":
