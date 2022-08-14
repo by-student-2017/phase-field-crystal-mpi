@@ -597,8 +597,8 @@ def main():
     for i in range(nx):
         for j in range(ny):
             for n in range(3):
-                theta = ( q_vectors[n, 0] * (i+1 - nx/2) * dx
-                        + q_vectors[n, 1] * (j+1 - ny/2) * dy )
+                theta = ( q_vectors[n, 0] * (i+1 - nx/2) * dx/2.0
+                        + q_vectors[n, 1] * (j+1 - ny/2) * dy/2.0 )
                 exp_part[n, i, j] = np.exp(1j*theta)
 
     #Take 80 PFC time siteps
@@ -617,9 +617,9 @@ def main():
                 #plt.pcolormesh( abs(eta[0]+eta[0].conjugate())
                 #              + abs(eta[1]+eta[1].conjugate())
                 #              + abs(eta[2]+eta[2].conjugate()) )
-                plt.pcolormesh( abs(eta[0]*exp_part[0]+(eta[0]*exp_part[0]).conjugate())
-                              + abs(eta[1]*exp_part[1]+(eta[1]*exp_part[1]).conjugate())
-                              + abs(eta[2]*exp_part[2]+(eta[2]*exp_part[2]).conjugate()) )
+                plt.pcolormesh( abs(eta[0]*exp_part[0]+(eta[0]*exp_part[0]).conjugate()
+                                  + eta[1]*exp_part[1]+(eta[1]*exp_part[1]).conjugate()
+                                  + eta[2]*exp_part[2]+(eta[2]*exp_part[2]).conjugate()) )
                 plt.xlim([0, nx])
                 plt.ylim([0, ny])
                 plt.title("time %.1f" % (ts*dt))
@@ -642,9 +642,9 @@ def main():
     plt.close(fig)
     #
     fig = plt.figure(figsize=(10, 10))
-    plt.pcolormesh( abs(eta[0]*exp_part[0]+(eta[0]*exp_part[0]).conjugate())
-            + abs(eta[1]*exp_part[1]+(eta[1]*exp_part[1]).conjugate())
-            + abs(eta[2]*exp_part[2]+(eta[2]*exp_part[2]).conjugate()) )
+    plt.pcolormesh( abs(eta[0]*exp_part[0]+(eta[0]*exp_part[0]).conjugate()
+                      + eta[1]*exp_part[1]+(eta[1]*exp_part[1]).conjugate()
+                      + eta[2]*exp_part[2]+(eta[2]*exp_part[2]).conjugate()) )
     plt.xlim([0, nx])
     plt.ylim([0, ny])
     plt.title("time last")
