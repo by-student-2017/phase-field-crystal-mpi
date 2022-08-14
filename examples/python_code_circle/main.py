@@ -34,7 +34,6 @@ out_time = 80   # output every "out_time/dt"
 
 max_iterations = 10000 # run for max_iterations time steps
 
-#angle = 0.0872665
 angle = 3.1415926/180*5.0 # the grain rotation angle [rad] (e.g., 5 [degree])
 amplitude = 0.10867304595992146 # the perfect lattice equilibrium value
 
