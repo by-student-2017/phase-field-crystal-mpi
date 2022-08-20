@@ -231,10 +231,10 @@ void PhaseField::initialize_eta_multiple_seeds() {
     std::vector<std::tuple<double, double, double, double>> seeds;
 	for (int i = 0; i < nparticles; i++) {
 		seeds.push_back( std::make_tuple( 
-			(double) (rand()/RAND_MAX), 
-			(double) (rand()/RAND_MAX),
-			(double) (rand()/RAND_MAX)*particle_radius, 
-			(double) (rand()/RAND_MAX)*angle
+			(double) rand()/RAND_MAX, 
+			(double) rand()/RAND_MAX,
+			(double) rand()/RAND_MAX*particle_radius, 
+			(double) rand()/RAND_MAX*angle
 		) );
 	}
 
