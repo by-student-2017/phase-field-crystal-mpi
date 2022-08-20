@@ -45,7 +45,7 @@ const double PhaseField::tt = 0.585;//tau * - (phi^3)/3, Eq.(2.1) and Eq.(2.2)
 const double PhaseField::vv = 1.0;  //nu  * (phi^4)/4,, Eq.(2.2)
 
 const int    PhaseField::out_time = 80;
-const int    PhaseField::max_iterations = 5000; 
+const int    PhaseField::max_iterations = 8000; 
 
 const int    PhaseField::nc = 3;
 
@@ -231,10 +231,10 @@ void PhaseField::initialize_eta_multiple_seeds() {
     std::vector<std::tuple<double, double, double, double>> seeds;
 	for (int i = 0; i < nparticles; i++) {
 		seeds.push_back( std::make_tuple( 
-			(double) rand()/RAND_MAX, 
-			(double) rand()/RAND_MAX,
-			(double) rand()/RAND_MAX*particle_radius, 
-			(double) rand()/RAND_MAX*angle
+			(double) (rand()/RAND_MAX), 
+			(double) (rand()/RAND_MAX),
+			(double) (rand()/RAND_MAX)*particle_radius, 
+			(double) (rand()/RAND_MAX-0.5)*2.0*angle
 		) );
 	}
 
