@@ -62,6 +62,11 @@ private:
 
     double calculate_radius();
 
+    static const double angle;
+    static const double amplitude;
+    static const int out_time;
+    static const int max_iterations;
+    complex<double> **exp_part;
 
 public:
 
@@ -86,6 +91,7 @@ public:
     ~PhaseField();
     
     void write_eta_to_file(string filepath);
+    void write_eta_to_vtk_file(string filepath);
     void read_eta_from_file(string filepath);
 
 

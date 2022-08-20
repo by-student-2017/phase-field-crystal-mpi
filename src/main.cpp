@@ -7,9 +7,13 @@
 
 #include "pfc.h"
 
+#include <sys/stat.h> // mkdir("./output");
+
 using namespace std;
 
 void run_calculations(int mpi_rank, int mpi_size) {
+
+    mkdir("./output", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
     PhaseField pfc(mpi_rank, mpi_size, "./output/");
 

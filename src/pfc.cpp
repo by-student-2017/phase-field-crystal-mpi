@@ -18,22 +18,30 @@
 //
 // initialization could also be done in header, if const->constexpr 
 
-const int PhaseField::nx = 512;
-const int PhaseField::ny = 512;
+const int PhaseField::nx = 512;      //grid size in x direction
+const int PhaseField::ny = 512;      //grid size in y direction
 
-const double PhaseField::dx = 0.25;
-const double PhaseField::dy = 0.25;
-const double PhaseField::dt = 0.125;
+const double PhaseField::dx = 0.25;  //space step in x dir.
+const double PhaseField::dy = 0.25;  //space step in x dir.
+const double PhaseField::dt = 0.125; //time step
 
+//one mode approximation lowest order reciprocal lattice vectors
+//2D hexagonal crystal symmetry. Eq.(2.4)
 const double PhaseField::q_vec[][2] = 
     {{-0.5*sq3, -0.5},
      {0.0, 1.0},
      {0.5*sq3, -0.5}};
 
-const double PhaseField::bx = 1.0;
-const double PhaseField::bl = 0.95;
-const double PhaseField::tt = 0.585;
-const double PhaseField::vv = 1.0;
+const double PhaseField::angle = 3.1415926/180*5.0; // the grain rotation angle [rad] (e.g., 5 [degree])
+const double PhaseField::amplitude = 0.10867304595992146;//the perfect lattice equilibrium value
+
+const double PhaseField::bx = 1.0;  //B^x in Eq.(2.7)
+const double PhaseField::bl = 0.95; //B^l = B^x - dB
+const double PhaseField::tt = 0.585;//tau * - (phi^3)/3, Eq.(2.1) and Eq.(2.2)
+const double PhaseField::vv = 1.0;  //nu  * (phi^4)/4,, Eq.(2.2)
+
+const int PhaseField::out_time = 80;
+const int PhaseField::max_iterations = 1000; 
 
 const int PhaseField::nc = 3;
 
@@ -66,7 +74,7 @@ PhaseField::PhaseField(int mpi_rank_, int mpi_size_, std::string output_path_)
     buffer_plan_f = (fftw_plan*) malloc(sizeof(fftw_plan)*nc);
     buffer_plan_b = (fftw_plan*) malloc(sizeof(fftw_plan)*nc);
 
-
+	exp_part = (complex<double>**) malloc(sizeof(complex<double>*)*nc);
 
     alloc_local = fftw_mpi_local_size_2d(nx, ny, MPI_COMM_WORLD,
             &local_nx, &local_nx_start);
@@ -114,6 +122,8 @@ PhaseField::PhaseField(int mpi_rank_, int mpi_size_, std::string output_path_)
                 reinterpret_cast<fftw_complex*>(buffer_k[i]),
                 reinterpret_cast<fftw_complex*>(buffer[i]),
                 MPI_COMM_WORLD, FFTW_BACKWARD, FFTW_ESTIMATE);
+    	
+    	exp_part[i] = reinterpret_cast<complex<double>*>(fftw_alloc_complex(alloc_local));
     }
 
 }
@@ -136,14 +146,16 @@ PhaseField::~PhaseField() {
 
     free(k_x_values); free(k_y_values);
     free(g_values);
+	
+	free(exp_part);
 }
 
 /*! Method, that initializes the state to a elastically rotated circle
  *
  */
 void PhaseField::initialize_eta_circle() {
-    double angle = 0.0872665;
-    double amplitude = 0.10867304595992146;
+    //double angle = 0.0872665;
+    //double amplitude = 0.10867304595992146;
 
     for (int i = 0; i < local_nx; i++) {
         int i_gl = i + local_nx_start;
@@ -171,7 +183,7 @@ void PhaseField::initialize_eta_circle() {
  *
  */
 void PhaseField::initialize_eta_seed() {
-    double amplitude = 0.10867304595992146;
+    //double amplitude = 0.10867304595992146;
     double seed_radius = 0.05*nx*dx;
 
     for (int i = 0; i < local_nx; i++) {
@@ -191,7 +203,7 @@ void PhaseField::initialize_eta_seed() {
  *
  */
 void PhaseField::initialize_eta_multiple_seeds() {
-    double amplitude = 0.10867304595992146;
+    //double amplitude = 0.10867304595992146;
 
     // <rel_x, rel_y, size, angle>
     /*
@@ -550,12 +562,42 @@ void PhaseField::write_eta_to_file(string filepath) {
     
         rcode = MPI_File_write(mpi_file, eta[c], local_nx*ny*2,
                     MPI_DOUBLE, MPI_STATUS_IGNORE);
-
+    
         if(rcode != MPI_SUCCESS)
             cerr << "Error: couldn't write file" << endl;
     }
 
     MPI_File_close(&mpi_file);
+}
+
+void PhaseField::write_eta_to_vtk_file(string filepath) {
+
+	FILE *fp;
+	fp = fopen(filepath.c_str(), "w");
+	fprintf(fp,"# vtk DataFile Version 3.0 \n");
+	fprintf(fp,"output.vtk \n");
+	fprintf(fp,"ASCII \n");
+	fprintf(fp,"DATASET STRUCTURED_POINTS \n");
+	fprintf(fp,"DIMENSIONS %5d %5d %5d \n",(nx),(ny),(1));
+	fprintf(fp,"ORIGIN 0.0 0.0 0.0 \n");
+	fprintf(fp,"ASPECT_RATIO %f %f %f \n",float(nx/nx),float(ny/nx),float(1));
+	fprintf(fp,"POINT_DATA %16d \n",((nx)*(ny)*(1)));
+	fprintf(fp,"SCALARS eta float \n");
+	fprintf(fp,"LOOKUP_TABLE default \n");
+	for(int j=0;j<ny;j++){
+		for(int i=0;i<nx;i++){
+			fprintf(fp,"%10.6f\n", (abs(eta[0][i*ny+j])+abs(eta[1][i*ny+j])+abs(eta[2][i*ny+j])));
+		}
+	}
+	fprintf(fp,"SCALARS phi float \n");
+	fprintf(fp,"LOOKUP_TABLE default \n");
+	for(int j=0;j<ny;j++){
+		for(int i=0;i<nx;i++){
+			fprintf(fp,"%10.6f\n",  (abs(eta[0][i*ny+j] *exp_part[0][i*ny+j]+conj(eta[0][i*ny+j]*exp_part[0][i*ny+j]))
+									+abs(eta[1][i*ny+j] *exp_part[1][i*ny+j]+conj(eta[1][i*ny+j]*exp_part[1][i*ny+j]))
+									+abs(eta[2][i*ny+j] *exp_part[2][i*ny+j]+conj(eta[2][i*ny+j]*exp_part[2][i*ny+j]))));
+		}
+	}
 }
 
 /*! Reads eta from a binary file written by write_eta_to_file
@@ -763,20 +805,38 @@ void PhaseField::continue_calculations() {
 void PhaseField::test() {
 	initialize_eta_multiple_seeds();
 	take_fft(eta_plan_f);
-	write_eta_to_file(output_path + "initial_conf.bin");
+	//write_eta_to_file(output_path + "initial_conf.bin");
 
-    for (int it = 0; it < 400; it++) {
-        overdamped_time_step();
-    }
+    //for (int it = 0; it < 400; it++) {
+    //    overdamped_time_step();
+    //}
 
-	write_eta_to_file(output_path + "eta50.bin");
+    //write_eta_to_file(output_path + "eta50.bin");
 
-	for (int it = 0; it < 400; it++) {
-		overdamped_time_step();
+    //for (int it = 0; it < 400; it++) {
+    //	overdamped_time_step();
+    //}
+
+    //write_eta_to_file(output_path + "eta100.bin");
+
+	double theta_phi;
+	for(int i=0;i<nx;i++){
+		for(int j=0;j<ny;j++){
+			for(int c=0;c<nc;c++){
+				theta_phi = ( q_vec[c][0] * (double)(i+1 - nx/2.0) * dx/2.0
+							+ q_vec[c][1] * (double)(j+1 - ny/2.0) * dy/2.0 );
+				exp_part[c][i*ny+j] = exp(complex<double>(0.0, 1.0)*theta_phi);
+			}
+		}
 	}
-
-	write_eta_to_file(output_path + "eta100.bin");
-
+	
+    for (int it = 0; it < max_iterations; it++) {
+        overdamped_time_step();
+    	if((it % out_time) == 0) {
+    		write_eta_to_file(output_path+"eta_"+to_string(it)+".bin");
+    		write_eta_to_vtk_file(output_path+"eta_"+to_string(it)+".vtk");
+    	}
+    }
 
 /*
 	initialize_eta_multiple_seeds();
