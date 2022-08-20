@@ -234,7 +234,7 @@ void PhaseField::initialize_eta_multiple_seeds() {
 			(double) (rand()/RAND_MAX), 
 			(double) (rand()/RAND_MAX),
 			(double) (rand()/RAND_MAX)*particle_radius, 
-			(double) (rand()/RAND_MAX-0.5)*2.0*angle
+			(double) (rand()/RAND_MAX)*angle
 		) );
 	}
 
