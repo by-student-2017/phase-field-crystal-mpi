@@ -52,4 +52,7 @@
 
 parameters: ./include/pfc.h and ./src/pfc.cpp
 main of pfc code: ./src/pfc.cpp and "void PhaseField::test()" of ./src/pfc.cpp
+After rewriting code.
+1. make clean
+2. make
 -----------------------------------------------------------------------------
