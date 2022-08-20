@@ -62,6 +62,8 @@ private:
 
     double calculate_radius();
 
+    static const int nparticles;
+    static const double particle_radius;
     static const double angle;
     static const double amplitude;
     static const int out_time;

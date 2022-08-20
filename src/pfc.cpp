@@ -13,6 +13,8 @@
 
 #include "pfc.h"
 
+#include <random>
+
 // ---------------------------------------------------------------
 // PARAMETERS
 //
@@ -32,7 +34,9 @@ const double PhaseField::q_vec[][2] =
      {0.0, 1.0},
      {0.5*sq3, -0.5}};
 
-const double PhaseField::angle = 3.1415926/180*5.0; // the grain rotation angle [rad] (e.g., 5 [degree])
+const int    PhaseField::nparticles = 5; // number of particles
+const double PhaseField::particle_radius = 0.15; // (max)
+const double PhaseField::angle = 3.1415926/180*20.0; // (max) the grain rotation angle [rad] (e.g., 5 [degree])
 const double PhaseField::amplitude = 0.10867304595992146;//the perfect lattice equilibrium value
 
 const double PhaseField::bx = 1.0;  //B^x in Eq.(2.7)
@@ -40,10 +44,10 @@ const double PhaseField::bl = 0.95; //B^l = B^x - dB
 const double PhaseField::tt = 0.585;//tau * - (phi^3)/3, Eq.(2.1) and Eq.(2.2)
 const double PhaseField::vv = 1.0;  //nu  * (phi^4)/4,, Eq.(2.2)
 
-const int PhaseField::out_time = 80;
-const int PhaseField::max_iterations = 1000; 
+const int    PhaseField::out_time = 80;
+const int    PhaseField::max_iterations = 5000; 
 
-const int PhaseField::nc = 3;
+const int    PhaseField::nc = 3;
 
 // ---------------------------------------------------------------
 
@@ -218,11 +222,21 @@ void PhaseField::initialize_eta_multiple_seeds() {
     };
     */
 
-
-    std::vector<std::tuple<double, double, double, double>> seeds = {
-			std::make_tuple(0.3, 0.5, 0.15, 0.0),
-			std::make_tuple(0.7, 0.5, 0.15, 0.2),
-    };
+    //std::vector<std::tuple<double, double, double, double>> seeds = {
+	//		std::make_tuple(0.3, 0.5, 0.15, 0.0),
+	//		std::make_tuple(0.7, 0.5, 0.15, 0.2),
+    //};
+	
+	std::srand(std::time(nullptr));
+    std::vector<std::tuple<double, double, double, double>> seeds;
+	for (int i = 0; i < nparticles; i++) {
+		seeds.push_back( std::make_tuple( 
+			(double) rand()/RAND_MAX, 
+			(double) rand()/RAND_MAX,
+			(double) rand()/RAND_MAX*particle_radius, 
+			(double) rand()/RAND_MAX*angle
+		) );
+	}
 
 
     for (int i = 0; i < local_nx; i++) {
